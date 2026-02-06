@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#000000">
+    <title>Barcode Scan Out Counter - Warehouse PMT Jatake</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --black: #000000;
+            --dark-gray: #1a1a1a;
+            --gray: #666666;
+            --light-gray: #cccccc;
+            --white: #ffffff;
+            --off-white: #f5f5f5;
+            --lion-parcel: #B71C1C;
+            --spx: #EE4D2D;
+            --jne: #1C3278;
+            --express21: #6A1B9A;
+            --jnt: #50C878;
+            --lex: #FFD700;
+            --success-green: #4CAF50;
+            --warning-orange: #FFA500;
+            --error-red: #F44336;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--white);
+            min-height: 100vh;
+            padding: 16px;
+            color: var(--black);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            border: 2px solid var(--black);
+            border-radius: 20px;
+            padding: 32px 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--black);
+            text-align: center;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 22px;
+            color: var(--black);
+            text-align: center;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: 1px;
+        }
+
+        .footer-info {
+            text-align: left;
+            font-size: 14px;
+            color: var(--black);
+            line-height: 1.8;
+            margin-bottom: 20px;
+            padding-left: 4px;
+            font-weight: 600;
+        }
+
+        .footer-info div {
+            margin-bottom: 3px;
+        }
+
+        /* Main Counter Cards */
+        .counter-grid-main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .counter-card-main {
+            background: var(--black);
+            padding: 24px;
+            border-radius: 16px;
+            color: var(--white);
+            border: 2px solid var(--black);
+        }
+
+        .counter-label-main {
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            color: var(--white);
+        }
+
+        .counter-value-main {
+            font-size: 48px;
+            font-weight: 900;
+            line-height: 1;
+            color: var(--white);
+        }
+
+        /* Breakdown Counter Cards */
+        .counter-grid-breakdown {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .counter-card-breakdown {
+            padding: 14px 16px;
+            border-radius: 12px;
+            color: var(--white);
+            border: 2px solid var(--black);
+        }
+
+        .counter-card-breakdown.lion-parcel { background: var(--lion-parcel); }
+        .counter-card-breakdown.spx { background: var(--spx); }
+        .counter-card-breakdown.jne { background: var(--jne); }
+        .counter-card-breakdown.express21 { background: var(--express21); }
+        .counter-card-breakdown.jnt { background: var(--jnt); }
+        .counter-card-breakdown.lex { background: var(--lex); color: var(--black); }
+
+        .counter-label-breakdown {
+            font-size: 11px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+
+        .counter-label-breakdown.dark-text { color: var(--black); }
+        .counter-courier-name { font-weight: 700; font-size: 12px; }
+        .counter-value-breakdown { font-size: 24px; font-weight: 400; line-height: 1; }
+        .counter-value-breakdown.dark-text { color: var(--black); }
+
+        /* Controls */
+        .controls {
+            background: var(--white);
+            border: 2px solid var(--black);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .selection-group {
+            margin-bottom: 20px;
+        }
+
+        .selection-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--black);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .selection-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid var(--black);
+            border-radius: 12px;
+            font-size: 16px;
+            background: var(--white);
+            color: var(--black);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .selection-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .selection-input.success-detect {
+            border-color: var(--success-green);
+            animation: pulse-green 0.6s ease-out;
+        }
+
+        .selection-input.warning-detect {
+            border-color: var(--warning-orange);
+            animation: pulse-orange 0.6s ease-out;
+        }
+
+        .selection-input.error-detect {
+            border-color: var(--error-red);
+            animation: shake 0.5s ease-out;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { 
+                border-color: var(--black); 
+                box-shadow: none;
+            }
+            50% { 
+                border-color: var(--success-green); 
+                box-shadow: 0 0 0 4px rgba(76, 175, 80, 0.3);
+            }
+        }
+
+        @keyframes pulse-orange {
+            0%, 100% { 
+                border-color: var(--black); 
+                box-shadow: none;
+            }
+            50% { 
+                border-color: var(--warning-orange); 
+                box-shadow: 0 0 0 4px rgba(255, 165, 0, 0.3);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+            20%, 40%, 60%, 80% { transform: translateX(4px); }
+        }
+
+        .btn-scan {
+            width: 100%;
+            background: var(--black);
+            border: none;
+            border-radius: 16px;
+            padding: 24px;
+            color: var(--white);
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-scan:active {
+            transform: scale(0.98);
+            background: var(--dark-gray);
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--black);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 8px;
+        }
+
+        input {
+            flex: 1;
+            padding: 14px 16px;
+            border: 2px solid var(--black);
+            border-radius: 12px;
+            font-size: 16px;
+            background: var(--white);
+            color: var(--black);
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-submit {
+            padding: 14px 20px;
+            background: var(--black);
+            border: none;
+            border-radius: 12px;
+            color: var(--white);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-action {
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: var(--black);
+            color: var(--white);
+            transition: all 0.3s ease;
+        }
+
+        .btn-action:active {
+            transform: scale(0.98);
+        }
+
+        .search-card {
+            background: var(--white);
+            border: 2px solid var(--black);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--black);
+            border-radius: 12px;
+            font-size: 15px;
+            background: var(--white);
+            color: var(--black);
+        }
+
+        .table-card {
+            background: var(--white);
+            border: 2px solid var(--black);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--black);
+        }
+
+        .table-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--black);
+        }
+
+        .table-count {
+            background: var(--black);
+            color: var(--white);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--black);
+        }
+
+        th {
+            padding: 14px 8px;
+            text-align: left;
+            color: var(--white);
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        th:first-child { border-top-left-radius: 12px; }
+        th:last-child { border-top-right-radius: 12px; }
+
+        tbody tr {
+            border-bottom: 1px solid var(--light-gray);
+            background: var(--white);
+        }
+
+        tbody tr:nth-child(even) {
+            background: var(--off-white);
+        }
+
+        tbody tr:hover {
+            background: #e8e8e8;
+        }
+
+        td {
+            padding: 14px 8px;
+            font-size: 12px;
+            color: var(--black);
+        }
+
+        td:nth-child(2) {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        .btn-delete {
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .btn-delete:hover {
+            background: var(--dark-gray);
+        }
+
+        .badge-yes {
+            background: var(--black);
+            color: var(--white);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .badge-no {
+            background: var(--light-gray);
+            color: var(--black);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--gray);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+        }
+
+        .modal.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            background: var(--black);
+            color: var(--white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .modal-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .close-btn {
+            background: var(--gray);
+            border: none;
+            color: var(--white);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .camera-container {
+            position: relative;
+            background: var(--black);
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        .scanner-frame {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%;
+            max-width: 500px;
+            height: 300px;
+            border: 4px solid var(--white);
+            border-radius: 20px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7);
+            pointer-events: none;
+        }
+
+        .scanner-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--white);
+            box-shadow: 0 0 20px var(--white);
+            animation: scan 2s ease-in-out infinite;
+        }
+
+        @keyframes scan {
+            0%, 100% { top: 0; opacity: 0; }
+            50% { top: 100%; opacity: 1; }
+        }
+
+        .camera-status {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--black);
+            color: var(--white);
+            padding: 14px 28px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 600;
+            max-width: 90%;
+            text-align: center;
+            border: 2px solid var(--white);
+        }
+
+        .modal-footer {
+            padding: 16px 20px;
+            background: var(--black);
+            text-align: center;
+            font-size: 14px;
+            color: var(--white);
+            flex-shrink: 0;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--black);
+            color: var(--white);
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            min-width: 280px;
+            max-width: 90%;
+            text-align: center;
+            opacity: 0;
+            transition: all 0.3s ease;
+            border: 2px solid var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast-message {
+            flex: 1;
+        }
+
+        .btn-undo {
+            background: var(--white);
+            color: var(--black);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        .btn-undo:hover {
+            background: var(--light-gray);
+        }
+
+        @media (max-width: 600px) {
+            .action-buttons, .counter-grid-main, .counter-grid-breakdown {
+                grid-template-columns: 1fr;
+            }
+            
+            .counter-value-main {
+                font-size: 36px;
+            }
+
+            .title {
+                font-size: 24px;
+                letter-spacing: 1px;
+            }
+
+            .subtitle {
+                font-size: 18px;
+            }
+
+            .footer-info {
+                font-size: 12px;
+                text-align: center;
+            }
+
+            th, td {
+                font-size: 10px;
+                padding: 10px 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="title">BARCODE SCAN OUT COUNTER</h1>
+            <div class="subtitle">Warehouse PMT JATAKE</div>
+            
+            <div class="footer-info">
+                <div>Establish: 21 November 2025</div>
+                <div>Version: 1.2 (05 Feb 2026) - Auto-Detect Enabled</div>
+                <div>Creator: Deva - Parts Management - Customer Care Department</div>
+            </div>
+            
+            <!-- Main Counters -->
+            <div class="counter-grid-main">
+                <div class="counter-card-main">
+                    <div class="counter-label-main">Total Resi</div>
+                    <div class="counter-value-main" id="totalResi">0</div>
+                </div>
+                <div class="counter-card-main">
+                    <div class="counter-label-main">Total Koli</div>
+                    <div class="counter-value-main" id="totalKoli">0</div>
+                </div>
+            </div>
+
+            <!-- Breakdown Counters -->
+            <div id="breakdownCounters"></div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="selection-group">
+                <label class="selection-label">🧑 PIC Scanner</label>
+                <select id="picSelect" class="selection-input">
+                    <option value="">-- Pilih PIC --</option>
+                    <option value="Budi">Budi</option>
+                    <option value="Andre">Andre</option>
+                    <option value="Gunawan">Gunawan</option>
+                    <option value="Suryana">Suryana</option>
+                    <option value="Agus">Agus</option>
+                    <option value="Deni">Deni</option>
+                    <option value="Paijo">Paijo</option>
+                </select>
+            </div>
+
+            <div class="selection-group">
+                <label class="selection-label">🚚 Nama Kurir <span style="font-size: 11px; font-weight: 400;">(Auto-Detect)</span></label>
+                <select id="kurirSelect" class="selection-input">
+                    <option value="">-- Pilih Kurir --</option>
+                    <option value="Lion Parcel">Lion Parcel</option>
+                    <option value="SPX">SPX</option>
+                    <option value="JNE">JNE</option>
+                    <option value="21Express">21Express</option>
+                    <option value="J&T">J&T</option>
+                    <option value="LEX">LEX</option>
+                </select>
+            </div>
+
+            <div class="selection-group">
+                <label class="selection-label">📦 Multi Package</label>
+                <select id="multiPackageSelect" class="selection-input">
+                    <option value="No">No</option>
+                    <option value="Yes">Yes</option>
+                </select>
+            </div>
+
+            <button id="scanButton" class="btn-scan">📷 Scan Barcode</button>
+
+            <div class="input-group">
+                <label class="input-label">Input Manual / Hardware Scanner</label>
+                <div class="input-wrapper">
+                    <input type="text" id="manualInput" placeholder="Scan atau ketik barcode..." autocomplete="off"/>
+                    <button class="btn-submit" id="submitBtn">Submit</button>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-action" id="exportBtn">📊 Export Excel</button>
+                <button class="btn-action" id="clearBtn">🗑️ Hapus Data</button>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <div class="search-card">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Cari barcode, PIC, kurir, tanggal..."/>
+        </div>
+
+        <!-- Table -->
+        <div class="table-card">
+            <div class="table-header">
+                <h3>Daftar Scan Barcode</h3>
+                <span class="table-count" id="tableCount">0 item</span>
+            </div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="35">No</th>
+                            <th>Barcode</th>
+                            <th width="75">PIC</th>
+                            <th width="90">Kurir</th>
+                            <th width="85">Multi Pkg</th>
+                            <th width="50">Count</th>
+                            <th width="95">Tanggal</th>
+                            <th width="75">Jam</th>
+                            <th width="60">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="9" class="empty-state">
+                                Belum ada barcode yang di-scan<br>
+                                <small>Pilih PIC dan Kurir, lalu mulai scan barcode</small>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Camera Modal -->
+        <div id="cameraModal" class="modal">
+            <div class="modal-header">
+                <h2>📷 Scan Barcode</h2>
+                <button class="close-btn" id="closeBtn">×</button>
+            </div>
+            <div class="camera-container">
+                <video id="video" autoplay playsinline></video>
+                <canvas id="canvas"></canvas>
+                <div class="scanner-frame">
+                    <div class="scanner-line"></div>
+                </div>
+                <div class="camera-status" id="cameraStatus">Memulai kamera...</div>
+            </div>
+            <div class="modal-footer">
+                💡 Arahkan kamera ke barcode. Auto-detect kurir aktif!
+            </div>
+        </div>
+
+        <div id="toast" class="toast">
+            <span class="toast-message" id="toastMessage"></span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script>
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        function playBeep(freq, duration, volume = 0.5) {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.value = freq;
+                osc.type = 'square';
+                gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration/1000);
+                osc.start(audioCtx.currentTime);
+                osc.stop(audioCtx.currentTime + duration/1000);
+            } catch(e) {}
+        }
+
+        function playSuccess() {
+            playBeep(523, 150, 0.6);
+            setTimeout(() => playBeep(659, 150, 0.6), 150);
+            setTimeout(() => playBeep(784, 250, 0.7), 300);
+        }
+
+        function playWarningPattern() {
+            playBeep(784, 200, 0.6);
+            setTimeout(() => playBeep(659, 300, 0.7), 250);
+        }
+
+        function playDuplicate() {
+            playBeep(330, 300, 0.7);
+            setTimeout(() => playBeep(330, 300, 0.7), 350);
+        }
+
+        class BarcodeApp {
+            constructor() {
+                this.scanData = this.loadData();
+                this.stream = null;
+                this.scanning = false;
+                this.scanInterval = null;
+                this.deletedItem = null;
+                this.deleteTimeout = null;
+                
+                this.courierOrder = ['Lion Parcel', 'SPX', 'JNE', '21Express', 'J&T', 'LEX'];
+                this.courierColors = {
+                    'Lion Parcel': 'lion-parcel',
+                    'SPX': 'spx',
+                    'JNE': 'jne',
+                    '21Express': 'express21',
+                    'J&T': 'jnt',
+                    'LEX': 'lex'
+                };
+                
+                this.init();
+            }
+
+            init() {
+                this.elements = {
+                    totalResi: document.getElementById('totalResi'),
+                    totalKoli: document.getElementById('totalKoli'),
+                    breakdownCounters: document.getElementById('breakdownCounters'),
+                    picSelect: document.getElementById('picSelect'),
+                    kurirSelect: document.getElementById('kurirSelect'),
+                    multiPackageSelect: document.getElementById('multiPackageSelect'),
+                    scanBtn: document.getElementById('scanButton'),
+                    manualInput: document.getElementById('manualInput'),
+                    submitBtn: document.getElementById('submitBtn'),
+                    exportBtn: document.getElementById('exportBtn'),
+                    clearBtn: document.getElementById('clearBtn'),
+                    searchInput: document.getElementById('searchInput'),
+                    tableBody: document.getElementById('tableBody'),
+                    tableCount: document.getElementById('tableCount'),
+                    modal: document.getElementById('cameraModal'),
+                    video: document.getElementById('video'),
+                    canvas: document.getElementById('canvas'),
+                    cameraStatus: document.getElementById('cameraStatus'),
+                    closeBtn: document.getElementById('closeBtn'),
+                    toast: document.getElementById('toast'),
+                    toastMessage: document.getElementById('toastMessage')
+                };
+
+                this.attachListeners();
+                this.updateUI();
+                this.loadLastPIC();
+                this.elements.multiPackageSelect.value = 'No';
+            }
+
+            attachListeners() {
+                this.elements.scanBtn.addEventListener('click', () => this.openCamera());
+                this.elements.manualInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.submitManual();
+                });
+                this.elements.submitBtn.addEventListener('click', () => this.submitManual());
+                this.elements.exportBtn.addEventListener('click', () => this.exportExcel());
+                this.elements.clearBtn.addEventListener('click', this.clearData.bind(this));
+                this.elements.searchInput.addEventListener('input', (e) => this.search(e.target.value));
+                this.elements.closeBtn.addEventListener('click', () => this.closeCamera());
+                this.elements.modal.addEventListener('click', (e) => {
+                    if (e.target === this.elements.modal) this.closeCamera();
+                });
+                this.elements.picSelect.addEventListener('change', () => this.savePIC());
+            }
+
+            loadLastPIC() {
+                const lastPIC = localStorage.getItem('lastPIC');
+                if (lastPIC) this.elements.picSelect.value = lastPIC;
+            }
+
+            savePIC() {
+                const pic = this.elements.picSelect.value;
+                if (pic) localStorage.setItem('lastPIC', pic);
+            }
+
+            detectCourier(barcode) {
+                const cleanBarcode = barcode.trim().toUpperCase();
+                
+                if ((cleanBarcode.startsWith('99LP') || cleanBarcode.startsWith('95LP')) 
+                    && cleanBarcode.length === 17) {
+                    return { 
+                        courier: 'Lion Parcel', 
+                        confidence: 99.6,
+                        matched: true 
+                    };
+                }
+                
+                if (cleanBarcode.startsWith('SPXID') && cleanBarcode.length === 17) {
+                    return { 
+                        courier: 'SPX', 
+                        confidence: 99.8,
+                        matched: true 
+                    };
+                }
+                
+                if (cleanBarcode.startsWith('JX') && cleanBarcode.length === 12) {
+                    return { 
+                        courier: 'J&T', 
+                        confidence: 95.7,
+                        matched: true 
+                    };
+                }
+                
+                if (cleanBarcode.startsWith('10') && cleanBarcode.length === 12 
+                    && /^\d+$/.test(cleanBarcode)) {
+                    return { 
+                        courier: '21Express', 
+                        confidence: 100,
+                        matched: true 
+                    };
+                }
+                
+                if (cleanBarcode.startsWith('CM') || cleanBarcode.startsWith('TG') || 
+                    cleanBarcode.startsWith('BLIJC') || cleanBarcode.startsWith('JT')) {
+                    return { 
+                        courier: 'JNE', 
+                        confidence: 100,
+                        matched: true 
+                    };
+                }
+                
+                return { 
+                    courier: null, 
+                    confidence: 0,
+                    matched: false 
+                };
+            }
+
+            applyDetectionFeedback(type) {
+                const kurirSelect = this.elements.kurirSelect;
+                kurirSelect.classList.remove('success-detect', 'warning-detect', 'error-detect');
+                
+                if (type === 'success') {
+                    kurirSelect.classList.add('success-detect');
+                } else if (type === 'warning') {
+                    kurirSelect.classList.add('warning-detect');
+                } else if (type === 'error') {
+                    kurirSelect.classList.add('error-detect');
+                }
+                
+                setTimeout(() => {
+                    kurirSelect.classList.remove('success-detect', 'warning-detect', 'error-detect');
+                }, 600);
+            }
+
+            submitManual() {
+                const pic = this.elements.picSelect.value;
+                
+                if (!pic) {
+                    this.showToast('⚠️ Pilih PIC Scanner terlebih dahulu!');
+                    return;
+                }
+
+                const barcode = this.elements.manualInput.value.trim();
+                if (!barcode) return;
+                
+                const detection = this.detectCourier(barcode);
+                
+                if (detection.matched) {
+                    this.elements.kurirSelect.value = detection.courier;
+                    playSuccess();
+                    this.applyDetectionFeedback('success');
+                    this.showToast(`✓ ${detection.courier} detected! (${detection.confidence}% confidence)`);
+                    
+                    const multiPackage = this.elements.multiPackageSelect.value;
+                    this.processBarcode(barcode, pic, detection.courier, multiPackage);
+                    this.elements.manualInput.value = '';
+                } else {
+                    playWarningPattern();
+                    this.applyDetectionFeedback('warning');
+                    this.showToast('⚠️ Pattern tidak dikenali. Pilih kurir manual.');
+                    
+                    const kurir = this.elements.kurirSelect.value;
+                    if (kurir) {
+                        const multiPackage = this.elements.multiPackageSelect.value;
+                        this.processBarcode(barcode, pic, kurir, multiPackage);
+                        this.elements.manualInput.value = '';
+                    } else {
+                        this.showToast('⚠️ Pilih kurir terlebih dahulu!');
+                    }
+                }
+            }
+
+            async openCamera() {
+                const pic = this.elements.picSelect.value;
+                
+                if (!pic) {
+                    this.showToast('⚠️ Pilih PIC Scanner terlebih dahulu!');
+                    return;
+                }
+
+                try {
+                    this.elements.modal.classList.add('active');
+                    this.updateStatus('Meminta akses kamera...');
+
+                    const constraints = {
+                        video: {
+                            facingMode: { ideal: 'environment' },
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 }
+                        }
+                    };
+
+                    this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    this.elements.video.srcObject = this.stream;
+                    
+                    await new Promise(resolve => {
+                        this.elements.video.onloadedmetadata = () => {
+                            this.elements.video.play();
+                            resolve();
+                        };
+                    });
+
+                    this.scanning = true;
+                    this.updateStatus('Siap! Auto-detect aktif...');
+                    this.showToast('✓ Kamera aktif! Auto-detect kurir enabled');
+                    
+                    this.scanInterval = setInterval(() => {
+                        if (this.scanning) this.scanFrame();
+                    }, 250);
+
+                } catch (err) {
+                    console.error('Camera error:', err);
+                    this.closeCamera();
+                    this.handleCameraError(err);
+                }
+            }
+
+            scanFrame() {
+                const video = this.elements.video;
+                const canvas = this.elements.canvas;
+                const ctx = canvas.getContext('2d');
+
+                if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
+
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                if (canvas.width === 0 || canvas.height === 0) return;
+
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                
+                try {
+                    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                        inversionAttempts: 'attemptBoth'
+                    });
+
+                    if (code && code.data && code.data.trim().length > 0) {
+                        const pic = this.elements.picSelect.value;
+                        const barcode = code.data;
+                        
+                        const detection = this.detectCourier(barcode);
+                        
+                        if (detection.matched) {
+                            const multiPackage = this.elements.multiPackageSelect.value;
+                            this.elements.kurirSelect.value = detection.courier;
+                            this.processBarcode(barcode, pic, detection.courier, multiPackage);
+                            this.closeCamera();
+                        } else {
+                            playWarningPattern();
+                            this.closeCamera();
+                            this.applyDetectionFeedback('warning');
+                            this.showToast('⚠️ Pattern tidak dikenali. Pilih kurir manual.');
+                            this.elements.manualInput.value = barcode;
+                        }
+                    }
+                } catch (e) {
+                    console.error('Scan error:', e);
+                }
+            }
+
+            closeCamera() {
+                this.scanning = false;
+                if (this.scanInterval) {
+                    clearInterval(this.scanInterval);
+                    this.scanInterval = null;
+                }
+                if (this.stream) {
+                    this.stream.getTracks().forEach(track => track.stop());
+                    this.stream = null;
+                }
+                if (this.elements.video) {
+                    this.elements.video.srcObject = null;
+                }
+                this.elements.modal.classList.remove('active');
+            }
+
+            handleCameraError(err) {
+                let msg = 'Tidak dapat mengakses kamera.\n\n';
+                if (err.name === 'NotAllowedError') {
+                    msg += '❌ Akses kamera ditolak!\n\nCARA FIX:\n1. Tap ikon kunci di address bar\n2. Izinkan "Camera"\n3. Refresh halaman';
+                } else if (err.name === 'NotFoundError') {
+                    msg += '❌ Kamera tidak ditemukan.';
+                } else if (err.name === 'NotReadableError') {
+                    msg += '❌ Kamera sedang digunakan aplikasi lain.';
+                } else {
+                    msg += '❌ Error: ' + err.message;
+                }
+                this.showToast(msg.split('\n')[0]);
+                alert(msg);
+            }
+
+            updateStatus(text) {
+                if (this.elements.cameraStatus) {
+                    this.elements.cameraStatus.textContent = text;
+                }
+            }
+
+            loadData() {
+                try {
+                    const data = localStorage.getItem('barcodeData');
+                    return data ? JSON.parse(data) : [];
+                } catch (e) {
+                    return [];
+                }
+            }
+
+            saveData() {
+                try {
+                    localStorage.setItem('barcodeData', JSON.stringify(this.scanData));
+                } catch (e) {
+                    this.showToast('Gagal menyimpan data');
+                }
+            }
+
+            processBarcode(barcode, pic, kurir, multiPackage) {
+                const cleanBarcode = barcode.trim();
+                if (!cleanBarcode) return;
+
+                const existingIndex = this.scanData.findIndex(item => item.barcode === cleanBarcode);
+                const now = new Date();
+
+                if (multiPackage === 'No') {
+                    if (existingIndex !== -1) {
+                        playDuplicate();
+                        this.applyDetectionFeedback('error');
+                        this.showToast('⚠️ Barcode ini sudah di-scan, tidak dihitung lagi.');
+                        return;
+                    }
+                    
+                    this.scanData.unshift({
+                        barcode: cleanBarcode,
+                        pic: pic,
+                        kurir: kurir,
+                        multiPackage: 'No',
+                        count: 1,
+                        date: this.formatDate(now),
+                        time: this.formatTime(now)
+                    });
+                    
+                    this.saveData();
+                    this.updateUI();
+                    playSuccess();
+                    this.showToast(`✓ Berhasil: ${cleanBarcode} | ${kurir} | PIC: ${pic}`);
+                } else {
+                    if (existingIndex !== -1) {
+                        this.scanData[existingIndex].count++;
+                        this.scanData[existingIndex].date = this.formatDate(now);
+                        this.scanData[existingIndex].time = this.formatTime(now);
+                        
+                        if (this.scanData[existingIndex].multiPackage === 'No') {
+                            this.scanData[existingIndex].multiPackage = 'Yes';
+                        }
+                    } else {
+                        this.scanData.unshift({
+                            barcode: cleanBarcode,
+                            pic: pic,
+                            kurir: kurir,
+                            multiPackage: 'Yes',
+                            count: 1,
+                            date: this.formatDate(now),
+                            time: this.formatTime(now)
+                        });
+                    }
+                    
+                    this.saveData();
+                    this.updateUI();
+                    playSuccess();
+                    const currentCount = existingIndex !== -1 ? this.scanData[existingIndex].count : 1;
+                    this.showToast(`✓ Berhasil: ${cleanBarcode} | Count: ${currentCount} | ${kurir}`);
+                }
+            }
+
+            formatDate(d) {
+                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            }
+
+            formatTime(d) {
+                return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+            }
+
+            updateUI() {
+                this.updateCounters();
+                this.updateTable();
+            }
+
+            updateCounters() {
+                const totalResi = this.scanData.length;
+                const totalKoli = this.scanData.reduce((sum, item) => sum + (item.count || 0), 0);
+                
+                this.elements.totalResi.textContent = totalResi;
+                this.elements.totalKoli.textContent = totalKoli;
+                this.elements.tableCount.textContent = `${totalResi} item`;
+
+                const kurirStats = {};
+                this.scanData.forEach(item => {
+                    const kurir = item.kurir || 'Unknown';
+                    if (!kurirStats[kurir]) {
+                        kurirStats[kurir] = { resi: 0, koli: 0 };
+                    }
+                    kurirStats[kurir].resi++;
+                    kurirStats[kurir].koli += (item.count || 0);
+                });
+
+                let breakdownHTML = '';
+                this.courierOrder.forEach(kurir => {
+                    if (kurirStats[kurir]) {
+                        const stats = kurirStats[kurir];
+                        const colorClass = this.courierColors[kurir] || '';
+                        const textClass = kurir === 'LEX' ? 'dark-text' : '';
+                        
+                        breakdownHTML += `
+                            <div class="counter-grid-breakdown">
+                                <div class="counter-card-breakdown ${colorClass}">
+                                    <div class="counter-label-breakdown ${textClass}">
+                                        <span class="counter-courier-name">${kurir}</span><br>
+                                        Total Resi
+                                    </div>
+                                    <div class="counter-value-breakdown ${textClass}">${stats.resi}</div>
+                                </div>
+                                <div class="counter-card-breakdown ${colorClass}">
+                                    <div class="counter-label-breakdown ${textClass}">
+                                        <span class="counter-courier-name">${kurir}</span><br>
+                                        Total Koli
+                                    </div>
+                                    <div class="counter-value-breakdown ${textClass}">${stats.koli}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+
+                this.elements.breakdownCounters.innerHTML = breakdownHTML;
+            }
+
+            updateTable(data = null) {
+                const items = data || this.scanData;
+                
+                if (items.length === 0) {
+                    this.elements.tableBody.innerHTML = `
+                        <tr><td colspan="9" class="empty-state">
+                            Belum ada barcode yang di-scan<br>
+                            <small>Scan barcode - Kurir auto-detect!</small>
+                        </td></tr>
+                    `;
+                    return;
+                }
+
+                this.elements.tableBody.innerHTML = items.map((item, i) => {
+                    const multiPackageBadge = item.multiPackage === 'Yes' 
+                        ? '<span class="badge-yes">Yes</span>' 
+                        : '<span class="badge-no">No</span>';
+                    
+                    return `
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>${this.escapeHtml(item.barcode)}</td>
+                            <td><strong>${item.pic || '-'}</strong></td>
+                            <td>${item.kurir || '-'}</td>
+                            <td>${multiPackageBadge}</td>
+                            <td><strong>${item.count || 1}</strong></td>
+                            <td>${item.date}</td>
+                            <td>${item.time}</td>
+                            <td><button class="btn-delete" onclick="app.deleteRow(${i})">❌</button></td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            deleteRow(index) {
+                if (this.deleteTimeout) {
+                    clearTimeout(this.deleteTimeout);
+                }
+
+                this.deletedItem = { item: this.scanData[index], index: index };
+                this.scanData.splice(index, 1);
+                this.saveData();
+                this.updateUI();
+
+                this.showToastWithUndo(`✓ Data dihapus`);
+
+                this.deleteTimeout = setTimeout(() => {
+                    this.deletedItem = null;
+                }, 5000);
+            }
+
+            undoDelete() {
+                if (this.deletedItem) {
+                    this.scanData.splice(this.deletedItem.index, 0, this.deletedItem.item);
+                    this.saveData();
+                    this.updateUI();
+                    this.deletedItem = null;
+                    if (this.deleteTimeout) {
+                        clearTimeout(this.deleteTimeout);
+                    }
+                    this.hideToast();
+                    this.showToast('✓ Data dikembalikan');
+                }
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            search(term) {
+                if (!term) {
+                    this.updateTable();
+                    return;
+                }
+                
+                const filtered = this.scanData.filter(item =>
+                    item.barcode.toLowerCase().includes(term.toLowerCase()) ||
+                    (item.pic && item.pic.toLowerCase().includes(term.toLowerCase())) ||
+                    (item.kurir && item.kurir.toLowerCase().includes(term.toLowerCase())) ||
+                    item.multiPackage.toLowerCase().includes(term.toLowerCase()) ||
+                    item.date.includes(term) ||
+                    item.time.includes(term)
+                );
+                
+                this.updateTable(filtered);
+            }
+
+            exportExcel() {
+                if (this.scanData.length === 0) {
+                    this.showToast('Tidak ada data untuk di-export');
+                    return;
+                }
+
+                try {
+                    const now = new Date();
+                    const exportDateTime = `${this.formatDate(now)} ${this.formatTime(now)}`;
+                    
+                    const totalResi = this.scanData.length;
+                    const totalKoli = this.scanData.reduce((sum, item) => sum + (item.count || 0), 0);
+                    
+                    // Calculate courier stats
+                    const kurirStats = {};
+                    this.scanData.forEach(item => {
+                        const kurir = item.kurir || 'Unknown';
+                        if (!kurirStats[kurir]) {
+                            kurirStats[kurir] = { resi: 0, koli: 0 };
+                        }
+                        kurirStats[kurir].resi++;
+                        kurirStats[kurir].koli += (item.count || 0);
+                    });
+
+                    // Create workbook
+                    const wb = XLSX.utils.book_new();
+
+                    // SHEET 1: Summary
+                    const summaryData = [];
+                    summaryData.push(['SUMMARY BARCODE SCAN OUT COUNTER']);
+                    summaryData.push(['Warehouse PMT JATAKE']);
+                    summaryData.push([`Export Date: ${exportDateTime}`]);
+                    summaryData.push([]);
+                    summaryData.push(['Total Resi', totalResi]);
+                    summaryData.push(['Total Koli', totalKoli]);
+                    summaryData.push([]);
+                    summaryData.push(['Kurir', 'Total Resi', 'Total Koli']);
+                    
+                    this.courierOrder.forEach(kurir => {
+                        if (kurirStats[kurir]) {
+                            summaryData.push([kurir, kurirStats[kurir].resi, kurirStats[kurir].koli]);
+                        }
+                    });
+
+                    const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+                    
+                    // Set column widths
+                    wsSummary['!cols'] = [
+                        { wch: 35 },
+                        { wch: 15 },
+                        { wch: 15 }
+                    ];
+
+                    // Bold headers
+                    const summaryRange = XLSX.utils.decode_range(wsSummary['!ref']);
+                    for (let R = 0; R <= 2; R++) {
+                        const cell = wsSummary[XLSX.utils.encode_cell({ r: R, c: 0 })];
+                        if (cell) {
+                            cell.s = { font: { bold: true } };
+                        }
+                    }
+
+                    XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
+
+                    // SHEET 2: Detail
+                    const detailData = [];
+                    detailData.push(['DETAIL SCAN DATA']);
+                    detailData.push([]);
+                    detailData.push(['No', 'Barcode', 'PIC', 'Kurir', 'Multi Package', 'Count', 'Tanggal', 'Jam']);
+                    
+                    this.scanData.forEach((item, i) => {
+                        detailData.push([
+                            i + 1,
+                            item.barcode,
+                            item.pic || '-',
+                            item.kurir || '-',
+                            item.multiPackage,
+                            item.count || 1,
+                            item.date,
+                            item.time
+                        ]);
+                    });
+
+                    const wsDetail = XLSX.utils.aoa_to_sheet(detailData);
+                    
+                    // Set column widths
+                    wsDetail['!cols'] = [
+                        { wch: 5 },   // No
+                        { wch: 20 },  // Barcode
+                        { wch: 12 },  // PIC
+                        { wch: 15 },  // Kurir
+                        { wch: 15 },  // Multi Package
+                        { wch: 8 },   // Count
+                        { wch: 12 },  // Tanggal
+                        { wch: 10 }   // Jam
+                    ];
+
+                    XLSX.utils.book_append_sheet(wb, wsDetail, 'Detail');
+
+                    // Generate filename
+                    const ts = now.toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                    const filename = `barcode-pmt-jatake-${ts}.xlsx`;
+
+                    // Download
+                    XLSX.writeFile(wb, filename);
+                    
+                    this.showToast('✓ Excel berhasil di-export');
+                } catch (e) {
+                    console.error('Export error:', e);
+                    this.showToast('Gagal export Excel');
+                }
+            }
+
+            clearData() {
+                if (this.scanData.length === 0) {
+                    this.showToast('Tidak ada data untuk dihapus');
+                    return;
+                }
+
+                if (window.confirm('Apakah Anda yakin ingin menghapus semua data?')) {
+                    try {
+                        this.scanData = [];
+                        this.saveData();
+                        this.updateUI();
+                        if (this.elements.searchInput) {
+                            this.elements.searchInput.value = '';
+                        }
+                        this.showToast('✓ Semua data berhasil dihapus');
+                    } catch (e) {
+                        console.error('Clear data error:', e);
+                        this.showToast('Gagal menghapus data');
+                    }
+                }
+            }
+
+            showToast(msg) {
+                this.elements.toastMessage.textContent = msg;
+                this.elements.toast.innerHTML = `<span class="toast-message">${msg}</span>`;
+                this.elements.toast.className = 'toast show';
+                setTimeout(() => {
+                    this.elements.toast.classList.remove('show');
+                }, 3500);
+            }
+
+            showToastWithUndo(msg) {
+                this.elements.toast.innerHTML = `
+                    <span class="toast-message">${msg}</span>
+                    <button class="btn-undo" onclick="app.undoDelete()">UNDO</button>
+                `;
+                this.elements.toast.className = 'toast show';
+                setTimeout(() => {
+                    this.elements.toast.classList.remove('show');
+                }, 5000);
+            }
+
+            hideToast() {
+                this.elements.toast.classList.remove('show');
+            }
+        }
+
+        let app;
+        document.addEventListener('DOMContentLoaded', () => {
+            app = new BarcodeApp();
+            console.log('Barcode Scanner v1.2 ready! Excel export enabled.');
+        });
+    </script>
+</body>
+</html>

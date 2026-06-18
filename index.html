@@ -24,6 +24,7 @@
             --jne: #1C3278;
             --express21: #6A1B9A;
             --jnt: #50C878;
+            --jnt-cargo: #006400;
             --lex: #FFD700;
             --success-green: #4CAF50;
             --warning-orange: #FFA500;
@@ -139,6 +140,7 @@
         .counter-card-breakdown.jne { background: var(--jne); }
         .counter-card-breakdown.express21 { background: var(--express21); }
         .counter-card-breakdown.jnt { background: var(--jnt); }
+        .counter-card-breakdown.jnt-cargo { background: var(--jnt-cargo); }
         .counter-card-breakdown.lex { background: var(--lex); color: var(--black); }
 
         .counter-label-breakdown {
@@ -196,6 +198,7 @@
             box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
         }
 
+        /* Auto-detect feedback animations */
         .selection-input.success-detect {
             border-color: var(--success-green);
             animation: pulse-green 0.6s ease-out;
@@ -672,148 +675,6 @@
                 padding: 10px 6px;
             }
         }
-
-        /* Pattern Reference Table */
-        .pattern-reference {
-            background: var(--off-white);
-            border: 2px solid var(--black);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .pattern-toggle {
-            background: var(--black);
-            color: var(--white);
-            border: none;
-            border-radius: 12px;
-            padding: 14px 20px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            text-align: left;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
-        }
-
-        .pattern-toggle:hover {
-            background: var(--dark-gray);
-        }
-
-        .pattern-toggle-icon {
-            font-size: 20px;
-            transition: transform 0.3s ease;
-        }
-
-        .pattern-toggle.active .pattern-toggle-icon {
-            transform: rotate(180deg);
-        }
-
-        .pattern-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-
-        .pattern-content.active {
-            max-height: 600px;
-            margin-top: 20px;
-        }
-
-        .pattern-table-wrapper {
-            overflow-x: auto;
-            border-radius: 12px;
-            border: 2px solid var(--black);
-        }
-
-        .pattern-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--white);
-        }
-
-        .pattern-table thead {
-            background: var(--black);
-        }
-
-        .pattern-table th {
-            padding: 14px 12px;
-            text-align: left;
-            color: var(--white);
-            font-weight: 600;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .pattern-table th:first-child {
-            border-top-left-radius: 10px;
-        }
-
-        .pattern-table th:last-child {
-            border-top-right-radius: 10px;
-        }
-
-        .pattern-table tbody tr {
-            border-bottom: 1px solid var(--light-gray);
-        }
-
-        .pattern-table tbody tr:last-child {
-            border-bottom: none;
-        }
-
-        .pattern-table tbody tr:hover {
-            background: var(--off-white);
-        }
-
-        .pattern-table td {
-            padding: 14px 12px;
-            font-size: 13px;
-            color: var(--black);
-        }
-
-        .pattern-prefix {
-            display: inline-block;
-            background: var(--black);
-            color: var(--white);
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-family: 'Courier New', monospace;
-            font-size: 11px;
-            font-weight: 700;
-            margin: 2px;
-        }
-
-        .pattern-unknown {
-            color: var(--gray);
-            font-style: italic;
-        }
-
-        .pattern-sample {
-            font-family: 'Courier New', monospace;
-            font-weight: 600;
-            font-size: 12px;
-            color: var(--dark-gray);
-        }
-
-        @media (max-width: 600px) {
-            .pattern-table th,
-            .pattern-table td {
-                font-size: 11px;
-                padding: 10px 8px;
-            }
-
-            .pattern-prefix {
-                font-size: 10px;
-                padding: 3px 6px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -856,8 +717,6 @@
                     <option value="Gunawan">Gunawan</option>
                     <option value="Suryana">Suryana</option>
                     <option value="Agus">Agus</option>
-                    <option value="Deni">Deni</option>
-                    <option value="Paijo">Paijo</option>
                 </select>
             </div>
 
@@ -870,6 +729,7 @@
                     <option value="JNE">JNE</option>
                     <option value="21Express">21Express</option>
                     <option value="J&T">J&T</option>
+                    <option value="J&T Cargo">J&T Cargo</option>
                     <option value="LEX">LEX</option>
                 </select>
             </div>
@@ -893,87 +753,8 @@
             </div>
 
             <div class="action-buttons">
-                <button class="btn-action" id="exportBtn">📊 Export Excel</button>
+                <button class="btn-action" id="exportBtn">💾 Export CSV</button>
                 <button class="btn-action" id="clearBtn">🗑️ Hapus Data</button>
-            </div>
-        </div>
-
-        <!-- Pattern Reference Table -->
-        <div class="pattern-reference">
-            <button class="pattern-toggle" id="patternToggle">
-                📋 Courier Pattern
-                <span class="pattern-toggle-icon">▼</span>
-            </button>
-            <div class="pattern-content" id="patternContent">
-                <div class="pattern-table-wrapper">
-                    <table class="pattern-table">
-                        <thead>
-                            <tr>
-                                <th>Courier</th>
-                                <th>Prefix</th>
-                                <th>Length</th>
-                                <th>Sample</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>Lion Parcel</strong></td>
-                                <td>
-                                    <span class="pattern-prefix">99LP</span>
-                                    <span class="pattern-prefix">95LP</span>
-                                </td>
-                                <td>17</td>
-                                <td class="pattern-sample">99LP1767356535789</td>
-                            </tr>
-                            <tr>
-                                <td><strong>SPX</strong></td>
-                                <td>
-                                    <span class="pattern-prefix">SPXID</span>
-                                </td>
-                                <td>17</td>
-                                <td class="pattern-sample">SPXID064556836711</td>
-                            </tr>
-                            <tr>
-                                <td><strong>JNE</strong></td>
-                                <td>
-                                    <span class="pattern-prefix">CM</span>
-                                    <span class="pattern-prefix">TG</span>
-                                    <span class="pattern-prefix">BLIJC</span>
-                                    <span class="pattern-prefix">JT</span>
-                                </td>
-                                <td>12-16</td>
-                                <td class="pattern-sample">CM23941614313</td>
-                            </tr>
-                            <tr>
-                                <td><strong>21Express</strong></td>
-                                <td>
-                                    <span class="pattern-prefix">10</span>
-                                    <span style="font-size: 11px; color: #666;">(numeric)</span>
-                                </td>
-                                <td>12</td>
-                                <td class="pattern-sample">100239144848</td>
-                            </tr>
-                            <tr>
-                                <td><strong>J&T</strong></td>
-                                <td>
-                                    <span class="pattern-prefix">JX</span>
-                                </td>
-                                <td>12</td>
-                                <td class="pattern-sample">JX6711639866</td>
-                            </tr>
-                            <tr>
-                                <td><strong>LEX</strong></td>
-                                <td>
-                                    <span class="pattern-unknown">❓ Unknown</span>
-                                </td>
-                                <td>
-                                    <span class="pattern-unknown">❓</span>
-                                </td>
-                                <td class="pattern-unknown">-</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
         </div>
 
@@ -1040,7 +821,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <script>
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
@@ -1060,20 +840,23 @@
             } catch(e) {}
         }
 
+        // Success sound (pattern matched / scan success)
         function playSuccess() {
-            playBeep(523, 150, 0.6);
-            setTimeout(() => playBeep(659, 150, 0.6), 150);
-            setTimeout(() => playBeep(784, 250, 0.7), 300);
+            playBeep(523, 150, 0.6);  // C5
+            setTimeout(() => playBeep(659, 150, 0.6), 150);  // E5
+            setTimeout(() => playBeep(784, 250, 0.7), 300);  // G5
         }
 
+        // Warning sound (no pattern match - manual selection required)
         function playWarningPattern() {
-            playBeep(784, 200, 0.6);
-            setTimeout(() => playBeep(659, 300, 0.7), 250);
+            playBeep(784, 200, 0.6);  // G4 (higher)
+            setTimeout(() => playBeep(659, 300, 0.7), 250);  // E4 (lower)
         }
 
+        // Duplicate sound (barcode already scanned)
         function playDuplicate() {
-            playBeep(330, 300, 0.7);
-            setTimeout(() => playBeep(330, 300, 0.7), 350);
+            playBeep(330, 300, 0.7);  // E4
+            setTimeout(() => playBeep(330, 300, 0.7), 350);  // E4
         }
 
         class BarcodeApp {
@@ -1084,15 +867,15 @@
                 this.scanInterval = null;
                 this.deletedItem = null;
                 this.deleteTimeout = null;
-                this.lastRejectedBarcode = null; // Track last rejected barcode
                 
-                this.courierOrder = ['Lion Parcel', 'SPX', 'JNE', '21Express', 'J&T', 'LEX'];
+                this.courierOrder = ['Lion Parcel', 'SPX', 'JNE', '21Express', 'J&T', 'J&T Cargo', 'LEX'];
                 this.courierColors = {
                     'Lion Parcel': 'lion-parcel',
                     'SPX': 'spx',
                     'JNE': 'jne',
                     '21Express': 'express21',
                     'J&T': 'jnt',
+                    'J&T Cargo': 'jnt-cargo',
                     'LEX': 'lex'
                 };
                 
@@ -1136,7 +919,7 @@
                     if (e.key === 'Enter') this.submitManual();
                 });
                 this.elements.submitBtn.addEventListener('click', () => this.submitManual());
-                this.elements.exportBtn.addEventListener('click', () => this.exportExcel());
+                this.elements.exportBtn.addEventListener('click', () => this.exportCSV());
                 this.elements.clearBtn.addEventListener('click', this.clearData.bind(this));
                 this.elements.searchInput.addEventListener('input', (e) => this.search(e.target.value));
                 this.elements.closeBtn.addEventListener('click', () => this.closeCamera());
@@ -1156,9 +939,11 @@
                 if (pic) localStorage.setItem('lastPIC', pic);
             }
 
+            // AUTO-DETECT COURIER based on barcode pattern
             detectCourier(barcode) {
                 const cleanBarcode = barcode.trim().toUpperCase();
                 
+                // Lion Parcel: 99LP or 95LP + 17 digits (99.6% accuracy)
                 if ((cleanBarcode.startsWith('99LP') || cleanBarcode.startsWith('95LP')) 
                     && cleanBarcode.length === 17) {
                     return { 
@@ -1168,6 +953,7 @@
                     };
                 }
                 
+                // SPX: SPXID + 12 digits (total 17) (99.8% accuracy)
                 if (cleanBarcode.startsWith('SPXID') && cleanBarcode.length === 17) {
                     return { 
                         courier: 'SPX', 
@@ -1176,6 +962,7 @@
                     };
                 }
                 
+                // J&T: JX + 10 digits (total 12) (95.7% accuracy)
                 if (cleanBarcode.startsWith('JX') && cleanBarcode.length === 12) {
                     return { 
                         courier: 'J&T', 
@@ -1184,6 +971,7 @@
                     };
                 }
                 
+                // 21Express: starts with 10, exactly 12 digits, all numeric (100% accuracy)
                 if (cleanBarcode.startsWith('10') && cleanBarcode.length === 12 
                     && /^\d+$/.test(cleanBarcode)) {
                     return { 
@@ -1193,6 +981,7 @@
                     };
                 }
                 
+                // JNE: Multiple formats (CM, TG, BLIJC, JT) (~100% accuracy)
                 if (cleanBarcode.startsWith('CM') || cleanBarcode.startsWith('TG') || 
                     cleanBarcode.startsWith('BLIJC') || cleanBarcode.startsWith('JT')) {
                     return { 
@@ -1202,6 +991,7 @@
                     };
                 }
                 
+                // NO MATCH - Manual selection required
                 return { 
                     courier: null, 
                     confidence: 0,
@@ -1209,10 +999,14 @@
                 };
             }
 
+            // Apply visual feedback to courier dropdown
             applyDetectionFeedback(type) {
                 const kurirSelect = this.elements.kurirSelect;
+                
+                // Remove all classes
                 kurirSelect.classList.remove('success-detect', 'warning-detect', 'error-detect');
                 
+                // Add appropriate class
                 if (type === 'success') {
                     kurirSelect.classList.add('success-detect');
                 } else if (type === 'warning') {
@@ -1221,6 +1015,7 @@
                     kurirSelect.classList.add('error-detect');
                 }
                 
+                // Remove class after animation
                 setTimeout(() => {
                     kurirSelect.classList.remove('success-detect', 'warning-detect', 'error-detect');
                 }, 600);
@@ -1241,76 +1036,33 @@
                 const detection = this.detectCourier(barcode);
                 
                 if (detection.matched) {
-                    // Pattern matched - auto process
+                    // Pattern matched - auto-select courier
                     this.elements.kurirSelect.value = detection.courier;
-                    this.lastRejectedBarcode = null; // Clear rejected barcode
                     playSuccess();
                     this.applyDetectionFeedback('success');
                     this.showToast(`✓ ${detection.courier} detected! (${detection.confidence}% confidence)`);
                     
+                    // Process barcode with auto-detected courier
                     const multiPackage = this.elements.multiPackageSelect.value;
                     this.processBarcode(barcode, pic, detection.courier, multiPackage);
                     this.elements.manualInput.value = '';
                 } else {
-                    // NO pattern match
+                    // NO pattern match - require manual selection
+                    playWarningPattern();
+                    this.applyDetectionFeedback('warning');
+                    this.showToast('⚠️ Pattern tidak dikenali. Pilih kurir manual.');
                     
-                    // Check if barcode already exists in database (for Multi Package increment)
-                    const existingIndex = this.scanData.findIndex(item => item.barcode === barcode);
-                    const multiPackage = this.elements.multiPackageSelect.value;
-                    
-                    if (existingIndex !== -1 && multiPackage === 'Yes') {
-                        // Barcode exists and Multi Package = Yes → Auto-increment
-                        const existingItem = this.scanData[existingIndex];
-                        const now = new Date();
-                        
-                        existingItem.count++;
-                        existingItem.date = this.formatDate(now);
-                        existingItem.time = this.formatTime(now);
-                        existingItem.multiPackage = 'Yes';
-                        
-                        this.saveData();
-                        this.updateUI();
-                        playSuccess();
-                        this.applyDetectionFeedback('success');
-                        this.showToast(`✓ Increment: ${barcode} | Count: ${existingItem.count} | ${existingItem.kurir}`);
+                    // Check if courier already selected
+                    const kurir = this.elements.kurirSelect.value;
+                    if (kurir) {
+                        // Courier already selected manually - process
+                        const multiPackage = this.elements.multiPackageSelect.value;
+                        this.processBarcode(barcode, pic, kurir, multiPackage);
                         this.elements.manualInput.value = '';
-                        this.lastRejectedBarcode = null; // Clear rejection flag
-                        return;
-                    }
-                    
-                    // Check if this is a resubmit of previously rejected barcode
-                    const isResubmit = (this.lastRejectedBarcode === barcode);
-                    
-                    if (!isResubmit) {
-                        // This is a NEW unknown barcode - ALWAYS reject first
-                        playWarningPattern();
-                        this.applyDetectionFeedback('warning');
-                        this.elements.kurirSelect.value = ''; // Reset dropdown
-                        this.lastRejectedBarcode = barcode; // Remember this rejection
-                        this.showToast('⚠️ Pattern tidak dikenali. Pilih kurir manual, lalu submit lagi!');
-                        return;
-                    }
-                    
-                    // This is a resubmit - check if courier is selected
-                    const kurirManual = this.elements.kurirSelect.value;
-                    
-                    if (!kurirManual) {
-                        // Resubmit but no courier selected - reject again
-                        playWarningPattern();
-                        this.applyDetectionFeedback('warning');
+                    } else {
+                        // Wait for manual courier selection
                         this.showToast('⚠️ Pilih kurir terlebih dahulu!');
-                        return;
                     }
-                    
-                    // Resubmit with manual selection - ALLOW
-                    this.lastRejectedBarcode = null; // Clear after successful process
-                    playSuccess();
-                    this.applyDetectionFeedback('success');
-                    this.showToast(`✓ Manual: ${kurirManual} (user selected)`);
-                    
-                    this.processBarcode(barcode, pic, kurirManual, multiPackage);
-                    this.elements.manualInput.value = '';
-                    this.elements.kurirSelect.value = ''; // Reset dropdown for next
                 }
             }
 
@@ -1382,14 +1134,17 @@
                         const pic = this.elements.picSelect.value;
                         const barcode = code.data;
                         
+                        // AUTO-DETECT COURIER
                         const detection = this.detectCourier(barcode);
                         
                         if (detection.matched) {
+                            // Pattern matched - auto-process
                             const multiPackage = this.elements.multiPackageSelect.value;
                             this.elements.kurirSelect.value = detection.courier;
                             this.processBarcode(barcode, pic, detection.courier, multiPackage);
                             this.closeCamera();
                         } else {
+                            // NO pattern match
                             playWarningPattern();
                             this.closeCamera();
                             this.applyDetectionFeedback('warning');
@@ -1486,6 +1241,7 @@
                     playSuccess();
                     this.showToast(`✓ Berhasil: ${cleanBarcode} | ${kurir} | PIC: ${pic}`);
                 } else {
+                    // Multi Package = Yes
                     if (existingIndex !== -1) {
                         this.scanData[existingIndex].count++;
                         this.scanData[existingIndex].date = this.formatDate(now);
@@ -1589,7 +1345,6 @@
                     return;
                 }
 
-                // Display items in order (newest first, since we use unshift)
                 this.elements.tableBody.innerHTML = items.map((item, i) => {
                     const multiPackageBadge = item.multiPackage === 'Yes' 
                         ? '<span class="badge-yes">Yes</span>' 
@@ -1666,7 +1421,7 @@
                 this.updateTable(filtered);
             }
 
-            exportExcel() {
+            exportCSV() {
                 if (this.scanData.length === 0) {
                     this.showToast('Tidak ada data untuk di-export');
                     return;
@@ -1679,7 +1434,6 @@
                     const totalResi = this.scanData.length;
                     const totalKoli = this.scanData.reduce((sum, item) => sum + (item.count || 0), 0);
                     
-                    // Calculate courier stats
                     const kurirStats = {};
                     this.scanData.forEach(item => {
                         const kurir = item.kurir || 'Unknown';
@@ -1690,92 +1444,45 @@
                         kurirStats[kurir].koli += (item.count || 0);
                     });
 
-                    // Create workbook
-                    const wb = XLSX.utils.book_new();
-
-                    // SHEET 1: Summary
-                    const summaryData = [];
-                    summaryData.push(['SUMMARY BARCODE SCAN OUT COUNTER']);
-                    summaryData.push(['Warehouse PMT JATAKE']);
-                    summaryData.push([`Export Date: ${exportDateTime}`]);
-                    summaryData.push([]);
-                    summaryData.push(['Total Resi', totalResi]);
-                    summaryData.push(['Total Koli', totalKoli]);
-                    summaryData.push([]);
-                    summaryData.push(['Kurir', 'Total Resi', 'Total Koli']);
+                    let csv = 'SUMMARY BARCODE SCAN OUT COUNTER\n';
+                    csv += 'Warehouse PMT JATAKE\n';
+                    csv += `Export Date: ${exportDateTime}\n\n`;
+                    
+                    csv += `Total Resi,${totalResi}\n`;
+                    csv += `Total Koli,${totalKoli}\n\n`;
+                    
+                    csv += 'Kurir,Total Resi,Total Koli\n';
                     
                     this.courierOrder.forEach(kurir => {
                         if (kurirStats[kurir]) {
-                            summaryData.push([kurir, kurirStats[kurir].resi, kurirStats[kurir].koli]);
+                            csv += `${kurir},${kurirStats[kurir].resi},${kurirStats[kurir].koli}\n`;
                         }
                     });
-
-                    const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
                     
-                    // Set column widths
-                    wsSummary['!cols'] = [
-                        { wch: 35 },
-                        { wch: 15 },
-                        { wch: 15 }
-                    ];
-
-                    // Bold headers
-                    const summaryRange = XLSX.utils.decode_range(wsSummary['!ref']);
-                    for (let R = 0; R <= 2; R++) {
-                        const cell = wsSummary[XLSX.utils.encode_cell({ r: R, c: 0 })];
-                        if (cell) {
-                            cell.s = { font: { bold: true } };
-                        }
-                    }
-
-                    XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
-
-                    // SHEET 2: Detail
-                    const detailData = [];
-                    detailData.push(['DETAIL SCAN DATA']);
-                    detailData.push([]);
-                    detailData.push(['No', 'Barcode', 'PIC', 'Kurir', 'Multi Package', 'Count', 'Tanggal', 'Jam']);
+                    csv += '\nDETAIL SCAN DATA\n';
+                    csv += 'No,Barcode,PIC,Kurir,Multi Package,Count,Tanggal,Jam\n';
                     
                     this.scanData.forEach((item, i) => {
-                        detailData.push([
-                            i + 1,
-                            item.barcode,
-                            item.pic || '-',
-                            item.kurir || '-',
-                            item.multiPackage,
-                            item.count || 1,
-                            item.date,
-                            item.time
-                        ]);
+                        csv += `${i + 1},"${item.barcode}","${item.pic || '-'}","${item.kurir || '-'}","${item.multiPackage}","${item.count || 1}",${item.date},${item.time}\n`;
                     });
 
-                    const wsDetail = XLSX.utils.aoa_to_sheet(detailData);
-                    
-                    // Set column widths
-                    wsDetail['!cols'] = [
-                        { wch: 5 },   // No
-                        { wch: 20 },  // Barcode
-                        { wch: 12 },  // PIC
-                        { wch: 15 },  // Kurir
-                        { wch: 15 },  // Multi Package
-                        { wch: 8 },   // Count
-                        { wch: 12 },  // Tanggal
-                        { wch: 10 }   // Jam
-                    ];
-
-                    XLSX.utils.book_append_sheet(wb, wsDetail, 'Detail');
-
-                    // Generate filename
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    const url = URL.createObjectURL(blob);
                     const ts = now.toISOString().replace(/[:.]/g, '-').slice(0, -5);
-                    const filename = `barcode-pmt-jatake-${ts}.xlsx`;
-
-                    // Download
-                    XLSX.writeFile(wb, filename);
                     
-                    this.showToast('✓ Excel berhasil di-export');
+                    link.href = url;
+                    link.download = `barcode-pmt-jatake-${ts}.csv`;
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    
+                    this.showToast('✓ CSV berhasil di-export');
                 } catch (e) {
                     console.error('Export error:', e);
-                    this.showToast('Gagal export Excel');
+                    this.showToast('Gagal export CSV');
                 }
             }
 
@@ -1829,18 +1536,7 @@
         let app;
         document.addEventListener('DOMContentLoaded', () => {
             app = new BarcodeApp();
-            console.log('Barcode Scanner v1.2 ready! Excel export enabled.');
-            
-            // Pattern reference toggle
-            const patternToggle = document.getElementById('patternToggle');
-            const patternContent = document.getElementById('patternContent');
-            
-            if (patternToggle && patternContent) {
-                patternToggle.addEventListener('click', () => {
-                    patternToggle.classList.toggle('active');
-                    patternContent.classList.toggle('active');
-                });
-            }
+            console.log('Barcode Scanner v1.2 ready! Auto-detect enabled.');
         });
     </script>
 </body>

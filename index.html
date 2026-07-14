@@ -943,13 +943,20 @@
             detectCourier(barcode) {
                 const cleanBarcode = barcode.trim().toUpperCase();
                 
-                // Lion Parcel: 99LP or 95LP + 17 digits (99.6% accuracy)
-                if ((cleanBarcode.startsWith('99LP') || cleanBarcode.startsWith('95LP')) 
+                // Lion Parcel: 99LP / 95LP (17 chars) or 9LP (16 chars)
+                if ((cleanBarcode.startsWith('99LP') || cleanBarcode.startsWith('95LP'))
                     && cleanBarcode.length === 17) {
-                    return { 
-                        courier: 'Lion Parcel', 
+                    return {
+                        courier: 'Lion Parcel',
                         confidence: 99.6,
-                        matched: true 
+                        matched: true
+                    };
+                }
+                if (cleanBarcode.startsWith('9LP') && cleanBarcode.length === 16) {
+                    return {
+                        courier: 'Lion Parcel',
+                        confidence: 99,
+                        matched: true
                     };
                 }
                 
@@ -962,12 +969,23 @@
                     };
                 }
                 
-                // J&T: JX + 10 digits (total 12) (95.7% accuracy)
-                if (cleanBarcode.startsWith('JX') && cleanBarcode.length === 12) {
-                    return { 
-                        courier: 'J&T', 
-                        confidence: 95.7,
-                        matched: true 
+                // J&T Express: JX / JY / JJ + 10 digits (total 12)
+                if ((cleanBarcode.startsWith('JX') || cleanBarcode.startsWith('JY') || cleanBarcode.startsWith('JJ'))
+                    && cleanBarcode.length === 12) {
+                    return {
+                        courier: 'J&T',
+                        confidence: 99,
+                        matched: true
+                    };
+                }
+
+                // J&T Cargo: starts with 2016 (12 digits) or 570 (12 digits), all numeric
+                if (/^\d+$/.test(cleanBarcode) && cleanBarcode.length === 12 &&
+                    (cleanBarcode.startsWith('2016') || cleanBarcode.startsWith('570'))) {
+                    return {
+                        courier: 'J&T Cargo',
+                        confidence: 98,
+                        matched: true
                     };
                 }
                 
@@ -1536,7 +1554,7 @@
         let app;
         document.addEventListener('DOMContentLoaded', () => {
             app = new BarcodeApp();
-            console.log('Barcode Scanner v1.2 ready! Auto-detect enabled.');
+            console.log('Barcode Scanner v1.3 ready! Auto-detect enabled.');
         });
     </script>
 </body>

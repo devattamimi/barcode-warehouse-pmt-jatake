@@ -449,6 +449,121 @@
             background: var(--dark-gray);
         }
 
+        .btn-edit {
+            background: #f5f5f5;
+            color: #333;
+            border: 1.5px solid #ccc;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            margin-right: 4px;
+        }
+
+        .btn-edit:hover {
+            background: #e0e0e0;
+        }
+
+        /* Edit Modal */
+        .edit-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .edit-modal.active {
+            display: flex;
+        }
+
+        .edit-modal-box {
+            background: #fff;
+            border-radius: 16px;
+            padding: 28px 24px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+        }
+
+        .edit-modal-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #1565C0;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .edit-field {
+            margin-bottom: 14px;
+        }
+
+        .edit-field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 5px;
+        }
+
+        .edit-field input,
+        .edit-field select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .edit-field input:focus,
+        .edit-field select:focus {
+            outline: none;
+            border-color: #1565C0;
+        }
+
+        .edit-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-save-edit {
+            flex: 1;
+            background: #1565C0;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-save-edit:hover { background: #0D47A1; }
+
+        .btn-cancel-edit {
+            flex: 1;
+            background: #f5f5f5;
+            color: #333;
+            border: 2px solid #e0e0e0;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-cancel-edit:hover { background: #ebebeb; }
+
         .badge-yes {
             background: var(--black);
             color: var(--white);
@@ -759,7 +874,7 @@
                     <option value="">-- Pilih PIC --</option>
                     <option value="Budi">Budi</option>
                     <option value="Andre">Andre</option>
-                    <option value="Gunawan">Gunawan</option>
+                    <option value="Rifan">Rifan</option>
                     <option value="Suryana">Suryana</option>
                     <option value="Agus">Agus</option>
                 </select>
@@ -833,7 +948,7 @@
                             <th width="50">Count</th>
                             <th width="95">Tanggal</th>
                             <th width="75">Jam</th>
-                            <th width="60">Aksi</th>
+                            <th width="90">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
@@ -870,6 +985,60 @@
         <div id="toast" class="toast">
             <span class="toast-message" id="toastMessage"></span>
         </div>
+
+        <!-- Edit Modal -->
+        <div class="edit-modal" id="editModal">
+            <div class="edit-modal-box">
+                <div class="edit-modal-title">✏️ Revisi Data</div>
+
+                <div class="edit-field">
+                    <label>Nomor Resi / Barcode</label>
+                    <input type="text" id="editBarcode" placeholder="Masukkan nomor resi" />
+                </div>
+
+                <div class="edit-field">
+                    <label>PIC Scanner</label>
+                    <select id="editPic">
+                        <option value="Budi">Budi</option>
+                        <option value="Andre">Andre</option>
+                        <option value="Rifan">Rifan</option>
+                        <option value="Suryana">Suryana</option>
+                        <option value="Agus">Agus</option>
+                    </select>
+                </div>
+
+                <div class="edit-field">
+                    <label>Kurir</label>
+                    <select id="editKurir">
+                        <option value="Lion Parcel">Lion Parcel</option>
+                        <option value="SPX">SPX</option>
+                        <option value="JNE">JNE</option>
+                        <option value="21Express">21Express</option>
+                        <option value="J&T">J&T</option>
+                        <option value="J&T Cargo">J&T Cargo</option>
+                        <option value="LEX">LEX</option>
+                    </select>
+                </div>
+
+                <div class="edit-field">
+                    <label>Multi Package</label>
+                    <select id="editMultiPackage">
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                    </select>
+                </div>
+
+                <div class="edit-field">
+                    <label>Count (Jumlah Koli)</label>
+                    <input type="number" id="editCount" min="1" value="1" />
+                </div>
+
+                <div class="edit-modal-actions">
+                    <button class="btn-cancel-edit" onclick="app.closeEditModal()">Batal</button>
+                    <button class="btn-save-edit" onclick="app.saveEdit()">💾 Simpan</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
@@ -899,10 +1068,11 @@
             setTimeout(() => playBeep(784, 250, 0.7), 300);  // G5
         }
 
-        // Warning sound (no pattern match - manual selection required)
+        // Warning sound: descending minor 3 notes (G4→Eb4→C4) — clearly "wrong/alert"
         function playWarningPattern() {
-            playBeep(784, 200, 0.6);  // G4 (higher)
-            setTimeout(() => playBeep(659, 300, 0.7), 250);  // E4 (lower)
+            playBeep(392, 200, 0.7);  // G4
+            setTimeout(() => playBeep(311, 200, 0.7), 220);  // Eb4
+            setTimeout(() => playBeep(261, 350, 0.8), 440);  // C4 — sustained
         }
 
         // Duplicate sound (barcode already scanned)
@@ -920,6 +1090,7 @@
                 this.deletedItem = null;
                 this.deleteTimeout = null;
                 this.pendingUnknownBarcode = null;
+                this.editingIndex = null;
                 
                 this.courierOrder = ['Lion Parcel', 'SPX', 'JNE', '21Express', 'J&T', 'J&T Cargo', 'LEX'];
                 this.courierColors = {
@@ -1144,14 +1315,13 @@
 
                 if (detection.matched) {
                     // Pattern matched - auto-select courier
+                    // NOTE: do NOT play sound here — processBarcode() handles all sounds
+                    // Playing here causes double sound when barcode is duplicate
                     this.pendingUnknownBarcode = null;
                     this.elements.kurirSelect.value = detection.courier;
                     this.hideWarningBanner();
-                    playSuccess();
-                    this.applyDetectionFeedback('success');
-                    this.showToast(`✓ ${detection.courier} detected! (${detection.confidence}% confidence)`);
 
-                    // Process barcode with auto-detected courier
+                    // Process barcode with auto-detected courier (sound played inside)
                     const multiPackage = this.elements.multiPackageSelect.value;
                     this.processBarcode(barcode, pic, detection.courier, multiPackage);
                     this.elements.manualInput.value = '';
@@ -1477,10 +1647,61 @@
                             <td><strong>${item.count || 1}</strong></td>
                             <td>${item.date}</td>
                             <td>${item.time}</td>
-                            <td><button class="btn-delete" onclick="app.deleteRow(${i})">❌</button></td>
+                            <td style="white-space:nowrap"><button class="btn-edit" onclick="app.editRow(${i})" title="Revisi">✏️</button><button class="btn-delete" onclick="app.deleteRow(${i})" title="Hapus">❌</button></td>
                         </tr>
                     `;
                 }).join('');
+            }
+
+            editRow(index) {
+                const item = this.scanData[index];
+                if (!item) return;
+
+                this.editingIndex = index;
+
+                document.getElementById('editBarcode').value = item.barcode || '';
+                document.getElementById('editPic').value = item.pic || 'Budi';
+                document.getElementById('editKurir').value = item.kurir || 'Lion Parcel';
+                document.getElementById('editMultiPackage').value = item.multiPackage || 'No';
+                document.getElementById('editCount').value = item.count || 1;
+
+                document.getElementById('editModal').classList.add('active');
+            }
+
+            closeEditModal() {
+                document.getElementById('editModal').classList.remove('active');
+                this.editingIndex = null;
+            }
+
+            saveEdit() {
+                if (this.editingIndex === null || this.editingIndex === undefined) return;
+
+                const newBarcode = document.getElementById('editBarcode').value.trim();
+                if (!newBarcode) {
+                    this.showToast('⚠️ Nomor resi tidak boleh kosong.');
+                    return;
+                }
+
+                // Check duplicate barcode (excluding the row being edited)
+                const isDuplicate = this.scanData.some((item, i) =>
+                    i !== this.editingIndex && item.barcode === newBarcode
+                );
+                if (isDuplicate) {
+                    this.showToast('❌ Barcode ini sudah ada di data lain!');
+                    return;
+                }
+
+                const item = this.scanData[this.editingIndex];
+                item.barcode  = newBarcode;
+                item.pic      = document.getElementById('editPic').value;
+                item.kurir    = document.getElementById('editKurir').value;
+                item.multiPackage = document.getElementById('editMultiPackage').value;
+                item.count    = parseInt(document.getElementById('editCount').value) || 1;
+
+                this.saveData();
+                this.updateUI();
+                this.closeEditModal();
+                this.showToast('✓ Data berhasil direvisi.');
             }
 
             deleteRow(index) {

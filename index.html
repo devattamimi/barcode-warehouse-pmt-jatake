@@ -647,6 +647,51 @@
             background: var(--light-gray);
         }
 
+        /* Warning Banner - unknown barcode pattern */
+        .warning-banner {
+            display: none;
+            background: #FFF8E1;
+            border: 2px solid #F57F17;
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 16px;
+        }
+
+        .warning-banner.show {
+            display: block;
+        }
+
+        .warning-banner-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #E65100;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .warning-banner-barcode {
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+            font-weight: 700;
+            color: #000;
+            background: #FFE0B2;
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .warning-banner-text {
+            font-size: 13px;
+            color: #5D4037;
+            line-height: 1.5;
+        }
+
+        .warning-banner-text strong {
+            color: #BF360C;
+        }
+
         @media (max-width: 600px) {
             .action-buttons, .counter-grid-main, .counter-grid-breakdown {
                 grid-template-columns: 1fr;
@@ -750,6 +795,13 @@
                     <input type="text" id="manualInput" placeholder="Scan atau ketik barcode..." autocomplete="off"/>
                     <button class="btn-submit" id="submitBtn">Submit</button>
                 </div>
+            </div>
+
+            <!-- Warning Banner: unknown barcode pattern -->
+            <div class="warning-banner" id="warningBanner">
+                <div class="warning-banner-title">⚠️ Barcode Tidak Dikenali</div>
+                <div class="warning-banner-barcode" id="warningBarcode"></div>
+                <div class="warning-banner-text" id="warningText"></div>
             </div>
 
             <div class="action-buttons">
@@ -867,6 +919,7 @@
                 this.scanInterval = null;
                 this.deletedItem = null;
                 this.deleteTimeout = null;
+                this.pendingUnknownBarcode = null;
                 
                 this.courierOrder = ['Lion Parcel', 'SPX', 'JNE', '21Express', 'J&T', 'J&T Cargo', 'LEX'];
                 this.courierColors = {
@@ -904,7 +957,10 @@
                     cameraStatus: document.getElementById('cameraStatus'),
                     closeBtn: document.getElementById('closeBtn'),
                     toast: document.getElementById('toast'),
-                    toastMessage: document.getElementById('toastMessage')
+                    toastMessage: document.getElementById('toastMessage'),
+                    warningBanner: document.getElementById('warningBanner'),
+                    warningBarcode: document.getElementById('warningBarcode'),
+                    warningText: document.getElementById('warningText')
                 };
 
                 this.attachListeners();
@@ -969,6 +1025,15 @@
                     };
                 }
                 
+                // LEX: LXAD prefix, 15 chars
+                if (cleanBarcode.startsWith('LXAD') && cleanBarcode.length === 15) {
+                    return {
+                        courier: 'LEX',
+                        confidence: 99,
+                        matched: true
+                    };
+                }
+
                 // J&T Express: JX / JY / JJ + 10 digits (total 12)
                 if ((cleanBarcode.startsWith('JX') || cleanBarcode.startsWith('JY') || cleanBarcode.startsWith('JJ'))
                     && cleanBarcode.length === 12) {
@@ -979,12 +1044,13 @@
                     };
                 }
 
-                // J&T Cargo: starts with 2016 (12 digits) or 570 (12 digits), all numeric
+                // J&T Cargo: 2016/2015 prefix, or 570 prefix — 12 digits all numeric
+                // 570xxx: J&T Express pre-Jun 2026, all 570xxx since Jun 2026 adalah J&T Cargo
                 if (/^\d+$/.test(cleanBarcode) && cleanBarcode.length === 12 &&
-                    (cleanBarcode.startsWith('2016') || cleanBarcode.startsWith('570'))) {
+                    (cleanBarcode.startsWith('2016') || cleanBarcode.startsWith('2015') || cleanBarcode.startsWith('570'))) {
                     return {
                         courier: 'J&T Cargo',
-                        confidence: 98,
+                        confidence: 95,
                         matched: true
                     };
                 }
@@ -1039,9 +1105,24 @@
                 }, 600);
             }
 
+            showWarningBanner(barcode) {
+                this.elements.warningBanner.classList.add('show');
+                this.elements.warningBarcode.textContent = barcode;
+                this.elements.warningText.innerHTML =
+                    'Format nomor resi ini <strong>tidak dikenali</strong> oleh sistem dan berada di luar pattern yang tersimpan.<br>' +
+                    'Kemungkinan penyebab: kurir baru, format barcode berubah, atau scan tidak lengkap.<br><br>' +
+                    '<strong>Pastikan kembali nomor resi ini milik kurir mana, lalu pilih kurir secara manual dari dropdown di atas, kemudian tekan Submit sekali lagi.</strong>';
+            }
+
+            hideWarningBanner() {
+                this.elements.warningBanner.classList.remove('show');
+                this.elements.warningBarcode.textContent = '';
+                this.elements.warningText.innerHTML = '';
+            }
+
             submitManual() {
                 const pic = this.elements.picSelect.value;
-                
+
                 if (!pic) {
                     this.showToast('⚠️ Pilih PIC Scanner terlebih dahulu!');
                     return;
@@ -1049,37 +1130,53 @@
 
                 const barcode = this.elements.manualInput.value.trim();
                 if (!barcode) return;
-                
+
+                // Minimum length validation — reject garbage input
+                if (barcode.length < 8) {
+                    playDuplicate();
+                    this.applyDetectionFeedback('error');
+                    this.showToast('❌ Barcode terlalu pendek (min. 8 karakter)');
+                    return;
+                }
+
                 // AUTO-DETECT COURIER
                 const detection = this.detectCourier(barcode);
-                
+
                 if (detection.matched) {
                     // Pattern matched - auto-select courier
+                    this.pendingUnknownBarcode = null;
                     this.elements.kurirSelect.value = detection.courier;
+                    this.hideWarningBanner();
                     playSuccess();
                     this.applyDetectionFeedback('success');
                     this.showToast(`✓ ${detection.courier} detected! (${detection.confidence}% confidence)`);
-                    
+
                     // Process barcode with auto-detected courier
                     const multiPackage = this.elements.multiPackageSelect.value;
                     this.processBarcode(barcode, pic, detection.courier, multiPackage);
                     this.elements.manualInput.value = '';
                 } else {
-                    // NO pattern match - require manual selection
-                    playWarningPattern();
-                    this.applyDetectionFeedback('warning');
-                    this.showToast('⚠️ Pattern tidak dikenali. Pilih kurir manual.');
-                    
-                    // Check if courier already selected
+                    // NO pattern match
                     const kurir = this.elements.kurirSelect.value;
-                    if (kurir) {
-                        // Courier already selected manually - process
+
+                    // Only proceed if THIS exact barcode was the one that triggered the warning
+                    // AND the user has now selected a courier manually
+                    if (this.pendingUnknownBarcode === barcode && kurir) {
+                        // Second submit after manual courier selection → process
+                        this.pendingUnknownBarcode = null;
+                        this.hideWarningBanner();
                         const multiPackage = this.elements.multiPackageSelect.value;
                         this.processBarcode(barcode, pic, kurir, multiPackage);
                         this.elements.manualInput.value = '';
+                        this.elements.kurirSelect.value = '';
                     } else {
-                        // Wait for manual courier selection
-                        this.showToast('⚠️ Pilih kurir terlebih dahulu!');
+                        // First attempt (or different barcode) - show warning banner + reset dropdown
+                        this.pendingUnknownBarcode = barcode;
+                        playWarningPattern();
+                        this.applyDetectionFeedback('warning');
+                        this.elements.kurirSelect.value = '';
+                        this.showWarningBanner(barcode);
+                        this.showToast('⚠️ Pattern tidak dikenali. Lihat peringatan di atas.');
                     }
                 }
             }
@@ -1166,8 +1263,10 @@
                             playWarningPattern();
                             this.closeCamera();
                             this.applyDetectionFeedback('warning');
-                            this.showToast('⚠️ Pattern tidak dikenali. Pilih kurir manual.');
+                            this.elements.kurirSelect.value = '';
                             this.elements.manualInput.value = barcode;
+                            this.showWarningBanner(barcode);
+                            this.showToast('⚠️ Pattern tidak dikenali. Lihat peringatan di bawah.');
                         }
                     }
                 } catch (e) {

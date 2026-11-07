@@ -17,7 +17,7 @@
 
 ## 🚀 Live Demo
 
-👉 [https://barcode-warehouse.vercel.app](https://barcode-warehouse.vercel.app)
+👉 [https://barcodescanoutcounterpmt.vercel.app](https://barcodescanoutcounterpmt.vercel.app)
 
 ## 📊 Pattern Recognition
 

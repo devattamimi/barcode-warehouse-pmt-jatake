@@ -362,6 +362,9 @@ select.input{appearance:none;-webkit-appearance:none;background-image:linear-gra
 .infobox{background:var(--off);border-radius:var(--r-md);padding:12px;font-size:13px;color:var(--charcoal);line-height:1.5}
 .infobox b{color:var(--black)}
 #btnSync2{grid-column:1/-1}
+.kdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:0}
+.pill.kp::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--kc);margin-right:5px;vertical-align:1px}
+.kbtn .kd{width:12px;height:12px}
 </style>
 <script id="lib-xlsx">/* SheetJS xlsx 0.18.5 (Apache-2.0) embedded for offline */
 /*! xlsx.js (C) 2013-present SheetJS -- http://sheetjs.com */
@@ -400,7 +403,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       <svg class="logo" viewBox="0 0 261.77 39.15" role="img" aria-label="MODENA"><path d="M78,.08A19.53,19.53,0,1,0,97.57,19.6,19.53,19.53,0,0,0,78,.08ZM78,30A10.36,10.36,0,1,1,88.4,19.6,10.36,10.36,0,0,1,78,30Z"/><path d="M216.55,0A4.59,4.59,0,0,0,212,4.58V26.05L191.29,2.26A6,6,0,0,0,180.6,6c0,.25,0,.46,0,.69l0,28.39a4.45,4.45,0,0,0,8.860-.06V13.48L210.24,37a6.22,6.22,0,0,0,10.840-4.15V4.58A4.57,4.57,0,0,0,216.55,0Z"/><path d="M260.83,32.42,238.55,4.48l-1.4-1.76A6.27,6.27,0,0,0,232,0a6.12,6.12,0,0,0-6.11,5.86v28.7a4.54,4.54,0,0,0,4.53,4.58A4.63,4.63,0,0,0,235,34.89V31.3h14.41l4.77,6A4.15,4.15,0,0,0,261.77,35,4.13,4.13,0,0,0,260.83,32.42ZM238.55,22.31H235V13.24l3.54,4.56,3.51,4.51Z"/><path d="M53.71,34.21V6.11a6,6,0,0,0-11.38-2.8l-12.48,20V6A5.95,5.95,0,0,0,18.57,3.36L.52,32.84a4.16,4.16,0,1,0,7.32,4L20.62,16.19V32.71a2.58,2.58,0,0,0,0,.48,5.9,5.9,0,0,0,5.87,5.89,6,6,0,0,0,5.29-3.25L44,16.19V34.31a4.86,4.86,0,0,0,9.71-.1Z"/><path d="M171.35,30.27v0H155.72V23.63l15.55,0a4.51,4.51,0,0,0,0-9H155.72V8.92h15.63a4.44,4.44,0,0,0,4.41-4.44A4.48,4.48,0,0,0,171.37,0L151.74,0a5,5,0,0,0-4.93,5V34.17a5,5,0,0,0,5,5l.48,0h19.12a4.43,4.43,0,0,0,0-8.86Z"/><path d="M125.36.1H107.42A4.9,4.9,0,0,0,102.53,5a2.56,2.56,0,0,0,0,.63v28a2.68,2.68,0,0,0,0,.63,4.91,4.91,0,0,0,4.89,4.91.71.71,0,0,0,.2,0h17.74c.07,0,16.7-.36,16.7-19.73S125.38.1,125.36.1Zm-1.09,29.73H112.05V9.25h12.22c.08,0,8.79,0,8.79,10.15S124.27,29.830,124.27,29.83Z"/></svg>
     </div>
     <h1>Barcode Scan Out Counter<span>Warehouse PMT Jatake</span></h1>
-    <p class="tagline">Setiap paket tercatat, setiap resi terhitung</p>
+    <p class="tagline">Stock Precision, Service Perfection</p>
     <div class="ver"><span>Version 2.1</span><span>Revamp 8 Nov 2026</span><span>Est. 21 Nov 2025</span></div>
     <div id="todayPill" class="data-pill ok"><i></i><span id="todayText">Hari ini · 0 resi · 0 koli</span></div>
   </div>
@@ -724,6 +727,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 var APP_VER='2.1';
 var PICS=['Budi','Andre','Rifan','Suryana','Agus'];
 var COURIERS=['Lion Parcel','SPX','JNE','21Express','J&T','J&T Cargo','LEX'];
+var KCOLOR={'Lion Parcel':'#E31E24','SPX':'#EE4D2D','JNE':'#005BAC','21Express':'#9C4DCC','J&T':'#E3001B','J&T Cargo':'#00A651','LEX':'#1B2A8C'};
+function kc(k){return KCOLOR[k]||'#626262';}
 var KEEP_DAYS=30;
 var SYNC=window.SYNC_CONFIG||{url:'',token:''};
 var K_STATE='bso2_state',K_OPT='bso2_opt',K_URL='bso2_url',K_DEV='bso2_device',K_KEYS='bso2_keys';
@@ -805,7 +810,7 @@ function askCourier(code){
   pendingUnknown=code;
   setBanner('unk','Kurir tidak dikenali','Format nomor resi ini tidak dikenali oleh sistem dan berada di luar pattern yang tersimpan. Kemungkinan penyebab: kurir baru, format barcode berubah, atau scan tidak lengkap.',code);
   $('kPickCode').textContent=code;
-  $('kGrid').innerHTML=COURIERS.map(function(k){return '<button class="kbtn" data-k="'+esc(k)+'"><span class="kd"></span>'+esc(k)+'</button>';}).join('');
+  $('kGrid').innerHTML=COURIERS.map(function(k){return '<button class="kbtn" data-k="'+esc(k)+'"><span class="kd" style="background:'+kc(k)+'"></span>'+esc(k)+'</button>';}).join('');
   $('kPick').style.display='block';
   $('kPick').scrollIntoView({behavior:'smooth',block:'center'});
   playWarningPattern();vibe([80,60,80,60,80]);
@@ -882,11 +887,11 @@ function bars(map,order){
   else keys.sort(function(a,b){return map[b].r-map[a].r;});
   if(!keys.length)return '<div class="empty">Belum ada data</div>';
   var mx=Math.max.apply(null,keys.map(function(k){return map[k].r;}))||1;
-  return keys.map(function(k){var v=map[k];return '<div class="cbar"><div class="n">'+esc(k)+'</div><div class="b"><i style="width:'+Math.max(2,Math.round(v.r/mx*100))+'%"></i></div><div class="v">'+fmt(v.r)+' <small>resi · '+fmt(v.k)+' koli</small></div></div>';}).join('');
+  return keys.map(function(k){var v=map[k];return '<div class="cbar"><div class="n">'+(order?'<i class="kdot" style="background:'+kc(k)+'"></i>':'')+esc(k)+'</div><div class="b"><i style="width:'+Math.max(2,Math.round(v.r/mx*100))+'%'+(order?';background:'+kc(k):'')+'"></i></div><div class="v">'+fmt(v.r)+' <small>resi · '+fmt(v.k)+' koli</small></div></div>';}).join('');
 }
 function syncedRid(){var m={};S.log.slice(S.sent).forEach(function(e){m[e[5]]=1;});return m;}
 function itemHtml(r,acts,pend){
-  return '<div class="ri'+(r.del?' del':'')+'"><span class="sdot'+(pend[r.rid]||r.legacy?'':' ok')+'" title="'+(r.legacy?'Data v1.2, tidak dikirim':pend[r.rid]?'Belum terkirim':'Sudah di Sheet')+'"></span><div class="c"><div class="pc code-txt">'+esc(r.code)+'</div><div class="pn"><span class="pill">'+esc(r.kurir||'-')+'</span>'+(r.multi==='Yes'?'<span class="pill m">Multi</span>':'')+(r.legacy?'<span class="pill w">v1.2</span>':'')+esc(r.pic||'-')+' · '+esc(String(r.last||r.first||'').slice(11,16))+(r.del?' · dihapus':'')+'</div></div><div class="q">'+fmt(r.koli)+'<small>koli</small></div>'+(acts&&!r.del?'<div class="acts"><button class="ibtn ic" data-ed="'+esc(r.rid)+'" aria-label="Edit"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16zM14 6l4 4"/></svg></button><button class="ibtn ic del" data-dl="'+esc(r.rid)+'" aria-label="Hapus"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></div>':'')+'</div>';
+  return '<div class="ri'+(r.del?' del':'')+'"><span class="sdot'+(pend[r.rid]||r.legacy?'':' ok')+'" title="'+(r.legacy?'Data v1.2, tidak dikirim':pend[r.rid]?'Belum terkirim':'Sudah di Sheet')+'"></span><div class="c"><div class="pc code-txt">'+esc(r.code)+'</div><div class="pn"><span class="pill kp" style="--kc:'+kc(r.kurir)+'">'+esc(r.kurir||'-')+'</span>'+(r.multi==='Yes'?'<span class="pill m">Multi</span>':'')+(r.legacy?'<span class="pill w">v1.2</span>':'')+esc(r.pic||'-')+' · '+esc(String(r.last||r.first||'').slice(11,16))+(r.del?' · dihapus':'')+'</div></div><div class="q">'+fmt(r.koli)+'<small>koli</small></div>'+(acts&&!r.del?'<div class="acts"><button class="ibtn ic" data-ed="'+esc(r.rid)+'" aria-label="Edit"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16zM14 6l4 4"/></svg></button><button class="ibtn ic del" data-dl="'+esc(r.rid)+'" aria-label="Hapus"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></div>':'')+'</div>';
 }
 function renderScan(){
   var on=!!S.pic;$('scNoSession').style.display=on?'none':'block';$('scBody').style.display=on?'block':'none';

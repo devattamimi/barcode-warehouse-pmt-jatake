@@ -1,5 +1,5 @@
 /**
- * MODENA Barcode Scan Out Counter v2.1 - penerima data scan resi (Google Apps Script Web App)
+ * MODENA Barcode Scan Out Counter v2.2 - penerima data scan resi (Google Apps Script Web App)
  * Parts Management, Customer Care Department
  *
  * Sheet yang dibuat otomatis:
@@ -20,7 +20,7 @@
  */
 
 var TOKEN = 'PMT-BSO-2026';   // harus sama dengan token di aplikasi
-var VERSION = '2.1';
+var VERSION = '2.2';
 var APP = 'MODENA Barcode Scan Out Counter';
 var LOG = 'LOG_SCAN', REKAP = 'REKAP_RESI', HARIAN = 'REKAP_HARIAN';
 var LOG_HEADER = ['ID', 'Waktu', 'Tanggal', 'Jam', 'Aksi', 'Resi ID', 'Nomor Resi', 'Kurir', 'PIC', 'Multi Package', 'Koli', 'Delta', 'Versi App', 'Device', 'Diterima Server'];
@@ -29,7 +29,7 @@ var TZ = 'Asia/Jakarta';
 
 function doGet(e) {
   var p = (e && e.parameter) || {};
-  if (p.keys || p.day) {
+  if (p.keys || p.day || p.from || p.all) {
     if (p.token !== TOKEN) return json_({ ok: false, error: 'Token salah' });
     var recs = readRekap_();
     if (p.keys) {
@@ -43,8 +43,12 @@ function doGet(e) {
       });
       return json_({ ok: true, version: VERSION, keys: out });
     }
-    var day = String(p.day);
-    return json_({ ok: true, version: VERSION, day: day, rows: recs.filter(function (r) { return String(r[6]) === day; }) });
+    // dashboard: semua tanggal (all=1), satu tanggal (day=), atau periode (from= & to=)
+    if (p.all) return json_({ ok: true, version: VERSION, all: true, rows: recs });
+    var from = String(p.from || p.day), to = String(p.to || p.day || p.from);
+    if (from > to) { var t = from; from = to; to = t; }
+    return json_({ ok: true, version: VERSION, from: from, to: to,
+      rows: recs.filter(function (r) { var d = String(r[6]); return d >= from && d <= to; }) });
   }
   var sh = sheet_(LOG, LOG_HEADER);
   return json_({ ok: true, app: APP, version: VERSION, rows: Math.max(0, sh.getLastRow() - 1) });

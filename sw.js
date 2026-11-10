@@ -1,6 +1,6 @@
 /* Barcode Scan Out Counter - service worker: aplikasi tetap bisa dibuka saat offline.
    Network-first: ambil versi terbaru kalau online, pakai cache kalau offline. */
-var CACHE = 'bso-v2.1';
+var CACHE = 'bso-v2.2';
 var CORE = ['./', './index.html'];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(CORE); }).then(function () { return self.skipWaiting(); }));

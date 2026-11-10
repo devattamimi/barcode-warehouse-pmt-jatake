@@ -372,10 +372,9 @@ select.input{appearance:none;-webkit-appearance:none;background-image:linear-gra
 .cbar .n .klg{height:20px;max-width:92px;display:flex;align-items:center}
 .cbar .n .klg img{max-height:20px;max-width:92px;display:block}
 .cbar .n .kn{font-size:13px;font-weight:600}
-.code-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}
-.code-row .code{margin-top:0;min-width:0}
-.bn-logo{flex:none;display:inline-flex;align-items:center;background:#FFFFFF;border-radius:10px;padding:7px 12px;box-shadow:0 1px 2px rgba(0,0,0,.08)}
-.bn-logo img{height:24px;max-width:110px;display:block}
+.bn-logo{position:absolute;right:16px;top:calc(50% + 18px);transform:translateY(-50%);display:flex;align-items:center;justify-content:center;background:#FFFFFF;border-radius:12px;padding:8px 12px;min-width:84px;box-shadow:0 1px 3px rgba(0,0,0,.10)}
+.bn-logo img{height:32px;max-width:116px;object-fit:contain;display:block}
+.banner.has-logo .sub,.banner.has-logo .code{max-width:calc(100% - 152px)}
 </style>
 <script id="lib-xlsx">/* SheetJS xlsx 0.18.5 (Apache-2.0) embedded for offline */
 /*! xlsx.js (C) 2013-present SheetJS -- http://sheetjs.com */
@@ -859,7 +858,7 @@ function saveScan(code,kurir,fromCam){
   }
   lastSaved=r;save();
   setBanner('yes',r.multi==='Yes'?'Koli ke-'+r.koli+' tersimpan':'Berhasil',kurir+' · PIC '+S.pic,code,r.multi==='Yes'?['Multi package','Total '+r.koli+' koli']:null);
-  (function(){var sb=$('banner').querySelector('.sub');var cd=$('banner').querySelector('.code');if(cd&&KLOGO[kurir]){var row=document.createElement('div');row.className='code-row';cd.parentNode.insertBefore(row,cd);row.appendChild(cd);row.insertAdjacentHTML('beforeend','<span class="bn-logo">'+klogo(kurir)+'</span>');}})();
+  (function(){var sb=$('banner').querySelector('.sub');if(KLOGO[kurir]){$('banner').classList.add('has-logo');$('banner').insertAdjacentHTML('beforeend','<span class="bn-logo">'+klogo(kurir)+'</span>');}})();
   playSuccess();vibe(60);
   renderScan();scheduleSync();
   afterScan(fromCam);

@@ -1173,7 +1173,7 @@ setTimeout(function(){refreshKeys(true);scheduleSync(2000);},1200);
 setInterval(function(){if(!document.hidden)refreshKeys();},120000);
 
 /* ---------- dashboard ---------- */
-var dashSrc='all',DASH={date:'',rows:null,at:''};
+var dashSrc='all',DASH={date:'',rows:null,at:''},dashReq=0,DASH_LOADING='';
 function rowsToRecs(rows){ // server: [rid, code, kurir, pic, multi, koli, tanggal, jamPertama, jamTerakhir, device, status]
   return rows.map(function(x){return {rid:x[0],code:x[1],kurir:x[2],pic:x[3],multi:x[4],koli:Number(x[5])||0,date:x[6],first:x[6]+' '+x[7],last:x[6]+' '+x[8],dev:x[9],status:x[10]||''};});
 }
@@ -1181,19 +1181,20 @@ function loadDash(force){
   var pr=per('dash'),d=perTag(pr),url=syncUrl();
   if(dashSrc!=='all'||!url){renderDash();return;}
   if(!force&&DASH.date===d&&DASH.rows)return renderDash();
-  $('dashRefresh').classList.add('spin');$('dashRefresh').disabled=true;
+  var my=++dashReq;DASH_LOADING=d;
+  $('dashRefresh').classList.add('spin');$('dashRefresh').disabled=true;renderDash();
   fetch(url+(url.indexOf('?')<0?'?':'&')+perQuery(pr)+'&token='+encodeURIComponent(SYNC.token),{redirect:'follow'})
     .then(function(r){return r.json();})
-    .then(function(j){if(!j||!j.ok||!Array.isArray(j.rows))throw new Error(j&&j.error||(j&&j.ok?'Apps Script masih versi lama, perlu di-update untuk periode/semua tanggal':'Data tidak valid'));DASH={date:d,rows:rowsToRecs(j.rows),at:stamp().slice(11,16)};})
-    .catch(function(e){DASH={date:d,rows:null,at:'',err:(e&&e.message)||'Gagal'};})
-    .then(function(){$('dashRefresh').classList.remove('spin');$('dashRefresh').disabled=false;renderDash();});
+    .then(function(j){if(!j||!j.ok||!Array.isArray(j.rows))throw new Error(j&&j.error||(j&&j.ok?'Apps Script masih versi lama, perlu di-update untuk periode/semua tanggal':'Data tidak valid'));if(my!==dashReq)return;DASH={date:d,rows:rowsToRecs(j.rows),at:stamp().slice(11,16)};})
+    .catch(function(e){if(my!==dashReq)return;DASH={date:d,rows:null,at:'',err:(e&&e.message)||'Gagal'};})
+    .then(function(){if(my!==dashReq)return;DASH_LOADING='';$('dashRefresh').classList.remove('spin');$('dashRefresh').disabled=false;renderDash();});
 }
 function renderDash(){
   var pr=per('dash'),d=perTag(pr),url=syncUrl(),note='',list,src;
   if(dashSrc==='all'&&url&&DASH.date===d&&DASH.rows){list=DASH.rows.filter(function(r){return r.status!=='Dihapus';});src='Semua HP · Google Sheet · update '+DASH.at;
     if(pendingCount())note=pendingCount()+' aktivitas HP ini belum terkirim, belum masuk angka di bawah.';}
   else{list=live().filter(function(r){return inPer(pr,r.date);});src='HP ini';
-    if(dashSrc==='all')note=!url?'Google Sheet belum diatur, angka di bawah hanya dari HP ini.':DASH.err?'Gagal ambil data Sheet ('+DASH.err+'). Angka di bawah hanya dari HP ini.':'';}
+    if(dashSrc==='all')note=!url?'Google Sheet belum diatur, angka di bawah hanya dari HP ini.':DASH_LOADING===d?'Memuat data Google Sheet. Sementara angka di bawah dari HP ini.':(DASH.err&&DASH.date===d)?'Gagal ambil data Sheet ('+DASH.err+'). Angka di bawah hanya dari HP ini.':'';}
   var a=agg(list);
   $('dashMeta').innerHTML='<b>'+esc(perLabel(pr))+'</b> · '+esc(src);
   $('dashNote').style.display=note?'block':'none';$('dashNote').textContent=note;
